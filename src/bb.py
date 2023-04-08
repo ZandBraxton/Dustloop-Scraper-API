@@ -81,6 +81,18 @@ async def getBBChar(gameTag, characterTag):
         for row in cellRows:
             tr_parse_details = BeautifulSoup(
                 row['data-details'], "html.parser")
+            all_imgs = tr_parse_details.find_all("img")
+            hitboxes = []
+            for i in all_imgs:
+                if "Hitbox" in i['src']:
+                    raw = i['src'].split('/thumb')
+                    if len(raw) == 1:
+                        hitbox = "https://www.dustloop.com" + raw[0]
+                    else:
+                        path = raw[1].split(".png")
+                        hitbox = "https://www.dustloop.com/wiki/images" + \
+                            path[0] + ".png"
+                    hitboxes.append(hitbox)
             find_image = tr_parse_details.find("img")
             # find_url = tr_parse_details.find("a")
             if find_image is not None:
@@ -126,13 +138,9 @@ async def getBBChar(gameTag, characterTag):
                                 move_text = "Projectile"
 
                     move.update(
-                        {header_text: move_text, "image": img})
+                        {header_text: move_text, "image": img, "hitboxes": hitboxes})
             moves.append(move)
             move_section = {"moveType": header.text, "moveList": moves}
         move_collection.append(move_section)
     data.update({"moveCollection": move_collection})
     return data
-
-
-def find_headers(tag):
-    return

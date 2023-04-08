@@ -94,6 +94,18 @@ async def getGGSTChar(gameTag, characterTag):
         for row in cellRows:
             tr_parse_details = BeautifulSoup(
                 row['data-details'], "html.parser")
+            all_imgs = tr_parse_details.find_all("img")
+            hitboxes = []
+            for i in all_imgs:
+                if "Hitbox" in i['src']:
+                    raw = i['src'].split('/thumb')
+                    if len(raw) == 1:
+                        hitbox = "https://www.dustloop.com" + raw[0]
+                    else:
+                        path = raw[1].split(".png")
+                        hitbox = "https://www.dustloop.com/wiki/images" + \
+                            path[0] + ".png"
+                    hitboxes.append(hitbox)
             find_image = tr_parse_details.find("img")
             if find_image is not None:
                 raw = find_image['src'].split('/thumb')
@@ -117,7 +129,7 @@ async def getGGSTChar(gameTag, characterTag):
                     if "prorate" in header_text:
                         header_text = "proration"
                     move.update(
-                        {header_text: cellData[i].text, "image": img})
+                        {header_text: cellData[i].text, "image": img, "hitboxes": hitboxes})
             moves.append(move)
         if header.text == "Supers":
             move_section = {"moveType": "Overdrives", "moveList": moves}
